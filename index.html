@@ -97,6 +97,9 @@ body{overflow:hidden; background:#000;}
 #priceWrap .price-level-null {
 	opacity: 0.3;
 }
+#currentId {
+	animation: shine-0 2s infinite ease ;
+}
 
 @keyframes shine-2 {
 	0% {
@@ -169,6 +172,7 @@ body{overflow:hidden; background:#000;}
 	    border-radius: 100px;
 	    opacity: 0.8;
 	    display: none;
+		z-index: 100;
 	"></div>
 
 	<div id="gifZone" style="
@@ -207,6 +211,7 @@ body{overflow:hidden; background:#000;}
 	    text-align: center;
 	    line-height: 200px;
 	    color: #fff;
+		z-index: 10;
 	"></div>
 
 	<div id="tipWrap" style="
@@ -223,6 +228,7 @@ body{overflow:hidden; background:#000;}
 	    text-align: center;
 	    line-height: 200px;
 	    color: #fff;
+		z-index: 10;
 	"></div>
 
 </div>
@@ -313,6 +319,7 @@ body{overflow:hidden; background:#000;}
 	font-family: STXihei;
 	z-index: 10;
 	text-align: center;
+	opacity: 0;
 ">
 	<span id="volume_bar" style="color:red;font-size:100px;">0</span>
 	<br>
@@ -331,6 +338,7 @@ body{overflow:hidden; background:#000;}
 	font-family: STXihei;
 	z-index: 10;
 	text-align: center;
+	opacity: 0;
 ">
 	<span id="speed_bar" style="color:blue;font-size:100px;">0</span>
 	<br>
@@ -413,7 +421,8 @@ var blackArray = `高荣昊
 寻书君
 张魁
 张鹏
-赵斌`.split(/\s/);
+赵斌
+梅园`.split(/\s/);
 
 var priceArrayMax = 100 || 20;
 var priceArray = localStorage.priceArray ? JSON.parse(localStorage.priceArray) : [];
@@ -782,7 +791,8 @@ function dealPics(spreadSpeed) {
 
 					oThis.children[0].style.opacity = 0.2;
 					
-					_o.transform( oThis, "rotateY(" + ( idx*_deg ) +"deg) translateZ(" + 3333 + "px)" );
+					// TODO 这里可以做成球形
+					_o.transform( oThis, "rotateY(" + ( idx*_deg ) +"deg) rotateZ(" + ( idx%2?Math.random()*20:-Math.random()*20 ) +"deg) translateZ(" + 3333 + "px)" );
 					
 				}, d * spreadSpeed );
 				
@@ -855,8 +865,34 @@ function beginShow() {
 	}, 3000);
 }
 
+// var perspectiveFlag = true;
+var rotateXFlag = false;
+var rotateZFlag = false;
+var rotateZ = 0;
 function transform() {
-	_o.transform( _o.stage[0], "perspective(" + _o.perspective + "px) rotateX("+ _o.rotateX +"deg) rotateY(" + _o.rotateY +"deg) scale3d("+scale+", "+scale+", "+scale+") translateY("+translateY+"px)" );
+	if(rotateZ>5) {
+		rotateZFlag = false;
+	}
+	if(rotateZ<-5) {
+		rotateZFlag = true;
+	}
+	rotateZ = rotateZ + (rotateZFlag ? 0.01 : -0.01);
+	if(_o.rotateX>-2.4) {
+		rotateXFlag = false;
+	}
+	if(_o.rotateX<-3.2) {
+		rotateXFlag = true;
+	}
+	_o.rotateX = _o.rotateX + (rotateXFlag ? 0.001 : -0.001);
+	// 中间值 _o.perspective: 800px, _o.rotateX: -2.8, scale: 0.2, translateY: 0px
+	// if(_o.perspective>900) {
+	// 	perspectiveFlag = false;
+	// }
+	// if(_o.perspective<800) {
+	// 	perspectiveFlag = true;
+	// }
+	// _o.perspective = _o.perspective + (perspectiveFlag ? 1 : -1);
+	_o.transform( _o.stage[0], "perspective(" + _o.perspective + "px) rotateX("+ _o.rotateX +"deg) rotateZ("+ rotateZ +"deg) rotateY(" + _o.rotateY +"deg) scale3d("+scale+", "+scale+", "+scale+") translateY("+translateY+"px)" );
 }
 
 var scale = 1;
